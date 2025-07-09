@@ -36,6 +36,9 @@ let courierStatusListener = null;
 let activeTab = 'available';
 let currentChatOrderId = null;
 let chatListener = null;
+let qrScannerStream = null;
+let currentScanOrderId = null;
+let qrScannerInterval = null;
 
 const showLoading = () => {
     document.getElementById('loading').style.display = 'flex';
@@ -371,8 +374,8 @@ const renderMyActiveOrders = (orders) => {
                 <button class="action-btn" onclick="event.stopPropagation(); openCourierChat('${order.id}')">
                     💬 Чат с клиентом
                 </button>
-                <button class="action-btn success" onclick="event.stopPropagation(); completeOrder('${order.id}')">
-                    Доставлено
+                <button class="action-btn success" onclick="event.stopPropagation(); startQRScan('${order.id}')">
+                    Сканировать QR
                 </button>
                 <button class="action-btn secondary" onclick="event.stopPropagation(); releaseOrder('${order.id}')">
                     Отказаться
@@ -452,18 +455,20 @@ const takeOrder = async (orderId) => {
     }
 };
 
-const completeOrder = async (orderId) => {
-    if (!confirm('Подтвердить доставку заказа?')) return;
+const completeOrder = async (orderId, isQRConfirmed = false) => {
+    if (!isQRConfirmed && !confirm('Подтвердить доставку заказа?')) return;
 
     try {
         showLoading();
 
         const orderRef = ref(rtdb, `orders/${orderId}`);
-        await update(orderRef, {
+        const updates = {
             status: 'completed',
-            deliveredAt: rtServerTimestamp()
-        });
+            deliveredAt: rtServerTimestamp(),
+            deliveryMethod: isQRConfirmed ? 'qr_scan' : 'manual'
+        };
 
+        await update(orderRef, updates);
         await deleteOrderChat(orderId);
 
     } catch (error) {
@@ -494,6 +499,152 @@ const releaseOrder = async (orderId) => {
         alert('Ошибка при отказе от заказа');
     } finally {
         hideLoading();
+    }
+};
+
+// QR Scanner Functions
+window.startQRScan = async (orderId) => {
+    try {
+        const orderRef = ref(rtdb, `orders/${orderId}`);
+        const snapshot = await get(orderRef);
+
+        if (!snapshot.exists()) {
+            alert('Заказ не найден');
+            return;
+        }
+
+        const order = { id: orderId, ...snapshot.val() };
+
+        currentScanOrderId = orderId;
+        document.getElementById('target-tent').textContent = order.tentNumber;
+        document.getElementById('qr-scanner-modal').style.display = 'flex';
+
+        await startCamera();
+
+    } catch (error) {
+        console.error('Ошибка запуска QR сканера:', error);
+        alert('Ошибка запуска сканера');
+    }
+};
+
+const startCamera = async () => {
+    try {
+        const video = document.getElementById('qr-scanner-video');
+        const constraints = {
+            video: {
+                facingMode: 'environment',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+
+        qrScannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = qrScannerStream;
+
+        video.addEventListener('loadedmetadata', () => {
+            video.play();
+            startQRDetection();
+        });
+
+    } catch (error) {
+        console.error('Ошибка доступа к камере:', error);
+        showQRResult('Ошибка доступа к камере', 'error');
+        document.getElementById('manual-confirm-btn').style.display = 'block';
+    }
+};
+
+const startQRDetection = () => {
+    const video = document.getElementById('qr-scanner-video');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    qrScannerInterval = setInterval(() => {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                handleQRCode(code.data);
+            }
+        }
+    }, 300);
+};
+
+const handleQRCode = async (qrData) => {
+    try {
+        clearInterval(qrScannerInterval);
+
+        const orderRef = ref(rtdb, `orders/${currentScanOrderId}`);
+        const snapshot = await get(orderRef);
+
+        if (!snapshot.exists()) {
+            showQRResult('Заказ не найден', 'error');
+            return;
+        }
+
+        const order = { id: currentScanOrderId, ...snapshot.val() };
+        const expectedQR = `tent-${order.tentNumber}`;
+
+        if (qrData === expectedQR) {
+            showQRResult('✅ QR код совпадает! Заказ будет помечен как доставленный.', 'success');
+
+            setTimeout(() => {
+                closeQRScanner();
+                completeOrder(currentScanOrderId, true);
+            }, 2000);
+
+        } else {
+            showQRResult(`❌ Неверный QR код. Ожидается: ${order.tentNumber}`, 'error');
+            document.getElementById('manual-confirm-btn').style.display = 'block';
+
+            setTimeout(() => {
+                startQRDetection();
+            }, 3000);
+        }
+
+    } catch (error) {
+        console.error('Ошибка обработки QR кода:', error);
+        showQRResult('Ошибка обработки QR кода', 'error');
+    }
+};
+
+const showQRResult = (message, type) => {
+    const resultDiv = document.getElementById('qr-scanner-result');
+    resultDiv.textContent = message;
+    resultDiv.className = `qr-scanner-result ${type}`;
+    resultDiv.style.display = 'block';
+};
+
+window.closeQRScanner = () => {
+    if (qrScannerStream) {
+        qrScannerStream.getTracks().forEach(track => track.stop());
+        qrScannerStream = null;
+    }
+
+    if (qrScannerInterval) {
+        clearInterval(qrScannerInterval);
+        qrScannerInterval = null;
+    }
+
+    document.getElementById('qr-scanner-modal').style.display = 'none';
+    document.getElementById('qr-scanner-result').style.display = 'none';
+    document.getElementById('manual-confirm-btn').style.display = 'none';
+
+    currentScanOrderId = null;
+};
+
+window.manualConfirm = () => {
+    if (!currentScanOrderId) return;
+
+    const confirmed = confirm('Вы уверены, что хотите подтвердить доставку вручную? Это действие нельзя отменить.');
+
+    if (confirmed) {
+        closeQRScanner();
+        completeOrder(currentScanOrderId, false);
     }
 };
 
@@ -681,8 +832,8 @@ window.showOrderDetails = async (orderId, type) => {
                 <button class="action-btn" onclick="closeModal(); openCourierChat('${order.id}')">
                     💬 Чат с клиентом
                 </button>
-                <button class="action-btn success" onclick="closeModal(); completeOrder('${order.id}')">
-                    Доставлено
+                <button class="action-btn success" onclick="closeModal(); startQRScan('${order.id}')">
+                    Сканировать QR
                 </button>
                 <button class="action-btn secondary" onclick="closeModal(); releaseOrder('${order.id}')">
                     Отказаться
@@ -708,6 +859,7 @@ window.takeOrder = takeOrder;
 window.completeOrder = completeOrder;
 window.releaseOrder = releaseOrder;
 window.logout = logout;
+window.loadOrders = loadOrders;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', login);
@@ -734,6 +886,13 @@ document.addEventListener('DOMContentLoaded', () => {
             closeChat();
         }
     });
-});
 
-window.loadOrders = loadOrders;
+    const qrModal = document.getElementById('qr-scanner-modal');
+    if (qrModal) {
+        qrModal.addEventListener('click', (e) => {
+            if (e.target === qrModal) {
+                closeQRScanner();
+            }
+        });
+    }
+});
