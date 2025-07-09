@@ -3,45 +3,67 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neko Vipes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Neko Wipes</title>
     <style>
+        /* Сброс отступов и границ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Фон и шрифт */
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #20B2AA 0%, #3CB371 100%);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 50px;
-            background: #20B2AA;
-            color: white;
+            overflow: hidden;
         }
 
+        /* Анимация плавного появления */
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Логотип */
         .logo {
-            font-size: 2rem;
-            margin-bottom: 20px;
+            font-size: 4rem;
+            margin-bottom: 1rem;
         }
 
-        a {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background: white;
-            color: #20B2AA;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+        /* Заголовок */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        a:hover {
-            background: #f0f0f0;
+        /* Описание */
+        p {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
     </style>
 </head>
 
 <body>
-    <div class="logo">🐱 Neko Vipes</div>
-    <p>Выберите панель:</p>
-    <a href="client/">Клиентская панель</a>
-    <a href="courier/">Курьерская панель</a>
-    <a href="admin/">Админ панель</a>
+    <div class="fade-in">
+        <div class="logo">🐱</div>
+        <h1>Добро пожаловать на Neko Wipes</h1>
+        <p>Заказ влажных салфеток на фестивалях<br>скоро будет доступен здесь.</p>
+    </div>
 </body>
 
 </html>
