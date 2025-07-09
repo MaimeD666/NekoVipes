@@ -97,8 +97,29 @@
                     <h3>Детали заказа</h3>
                     <button class="close-btn" onclick="closeModal()">×</button>
                 </div>
-                <div class="modal-content" id="modal-content"></div>
-                <div class="modal-actions" id="modal-actions"></div>
+                <div class="modal-content" id="modal-content">
+                </div>
+                <div class="modal-actions" id="modal-actions">
+                </div>
+            </div>
+        </div>
+
+        <div class="qr-scanner-modal" id="qr-scanner-modal" style="display: none;">
+            <div class="qr-scanner-container">
+                <div class="qr-scanner-header">
+                    <h3>Сканирование QR кода</h3>
+                    <button class="qr-scanner-close-btn" onclick="closeQRScanner()">×</button>
+                </div>
+                <div class="qr-scanner-content">
+                    <video id="qr-video" autoplay></video>
+                    <div class="qr-scanner-overlay">
+                        <div class="qr-scanner-frame"></div>
+                    </div>
+                </div>
+                <div class="qr-scanner-info">
+                    <p>Наведите камеру на QR код палатки</p>
+                    <p id="qr-scanner-status">Готов к сканированию</p>
+                </div>
             </div>
         </div>
 
@@ -116,40 +137,12 @@
             </div>
         </div>
 
-        <div class="qr-scanner-modal" id="qr-scanner-modal" style="display: none;">
-            <div class="qr-scanner-container">
-                <div class="qr-scanner-header">
-                    <h3 id="qr-scanner-title">Сканирование QR кода</h3>
-                    <button class="qr-scanner-close-btn" onclick="closeQRScanner()">×</button>
-                </div>
-                <div class="qr-scanner-content">
-                    <div class="qr-scanner-info">
-                        <p>Отсканируйте QR код на палатке <strong id="target-tent"></strong></p>
-                    </div>
-                    <div class="qr-scanner-camera">
-                        <video id="qr-scanner-video" autoplay playsinline></video>
-                        <div class="qr-scanner-overlay">
-                            <div class="qr-scanner-frame"></div>
-                        </div>
-                    </div>
-                    <div class="qr-scanner-result" id="qr-scanner-result" style="display: none;"></div>
-                </div>
-                <div class="qr-scanner-actions">
-                    <button class="action-btn secondary" onclick="closeQRScanner()">Отмена</button>
-                    <button class="action-btn success" id="manual-confirm-btn" onclick="manualConfirm()"
-                        style="display: none;">
-                        Подтвердить вручную
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <div class="loading" id="loading" style="display: none;">
             <div class="spinner"></div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script type="module" src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.min.js"></script>
     <script type="module" src="courier.js"></script>
 </body>
 
