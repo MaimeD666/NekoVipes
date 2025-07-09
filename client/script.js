@@ -29,13 +29,131 @@ const COLLECTIONS = {
     PRODUCTS: 'products'
 };
 
+// Ключи для localStorage
+const STORAGE_KEYS = {
+    USER_DATA: 'nekoVipes_userData',
+    CART: 'nekoVipes_cart',
+    USER_ORDERS: 'nekoVipes_userOrders',
+    DEVICE_ID: 'nekoVipes_deviceId'
+};
+
 let products = [];
 let cart = [];
-let userOrderIds = JSON.parse(localStorage.getItem('userOrderIds') || '[]');
+let userData = {};
 let userOrders = [];
 let ordersListener = null;
 let currentChatOrderId = null;
 let chatListener = null;
+let deviceId = '';
+
+// Генерация уникального ID устройства
+const generateDeviceId = () => {
+    return 'device_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+};
+
+// Получение или создание ID устройства
+const getDeviceId = () => {
+    let id = localStorage.getItem(STORAGE_KEYS.DEVICE_ID);
+    if (!id) {
+        id = generateDeviceId();
+        localStorage.setItem(STORAGE_KEYS.DEVICE_ID, id);
+    }
+    return id;
+};
+
+// Сохранение пользовательских данных
+const saveUserData = () => {
+    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
+};
+
+// Загрузка пользовательских данных
+const loadUserData = () => {
+    const saved = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+    if (saved) {
+        try {
+            userData = JSON.parse(saved);
+        } catch (error) {
+            console.error('Ошибка загрузки данных пользователя:', error);
+            userData = {};
+        }
+    }
+    
+    // Автозаполнение формы
+    if (userData.tentLetter) {
+        const tentLetterSelect = document.getElementById('tent-letter');
+        if (tentLetterSelect) {
+            tentLetterSelect.value = userData.tentLetter;
+        }
+    }
+    
+    if (userData.tentNumber) {
+        const tentNumberInput = document.getElementById('tent-number');
+        if (tentNumberInput) {
+            tentNumberInput.value = userData.tentNumber;
+        }
+    }
+    
+    if (userData.phone) {
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.value = userData.phone;
+        }
+    }
+};
+
+// Сохранение корзины
+const saveCart = () => {
+    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
+};
+
+// Загрузка корзины
+const loadCart = () => {
+    const saved = localStorage.getItem(STORAGE_KEYS.CART);
+    if (saved) {
+        try {
+            cart = JSON.parse(saved);
+            updateCartDisplay();
+        } catch (error) {
+            console.error('Ошибка загрузки корзины:', error);
+            cart = [];
+        }
+    }
+};
+
+// Сохранение ID заказов пользователя
+const saveUserOrders = () => {
+    const orderIds = userOrders.map(order => order.id);
+    localStorage.setItem(STORAGE_KEYS.USER_ORDERS, JSON.stringify(orderIds));
+};
+
+// Загрузка ID заказов пользователя
+const loadUserOrderIds = () => {
+    const saved = localStorage.getItem(STORAGE_KEYS.USER_ORDERS);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (error) {
+            console.error('Ошибка загрузки ID заказов:', error);
+            return [];
+        }
+    }
+    return [];
+};
+
+// Очистка данных пользователя (для отладки)
+const clearUserData = () => {
+    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    localStorage.removeItem(STORAGE_KEYS.CART);
+    localStorage.removeItem(STORAGE_KEYS.USER_ORDERS);
+    userData = {};
+    cart = [];
+    userOrders = [];
+    updateCartDisplay();
+    location.reload();
+};
+
+// Добавляем функцию очистки в window для отладки
+window.clearUserData = clearUserData;
 
 const showLoading = () => {
     document.getElementById('loading').style.display = 'flex';
@@ -217,6 +335,7 @@ window.addToCart = (productId) => {
     }
 
     updateCartDisplay();
+    saveCart(); // Сохраняем корзину
     document.getElementById(`qty-${productId}`).value = 1;
 
     const button = event.target;
@@ -287,11 +406,13 @@ window.updateCartItem = (index, change) => {
     }
 
     updateCartDisplay();
+    saveCart(); // Сохраняем корзину
 };
 
 window.removeFromCart = (index) => {
     cart.splice(index, 1);
     updateCartDisplay();
+    saveCart(); // Сохраняем корзину
 };
 
 const showCheckout = () => {
@@ -314,9 +435,10 @@ const generateOrderId = () => {
 };
 
 const saveUserOrderId = (orderId) => {
-    if (!userOrderIds.includes(orderId)) {
-        userOrderIds.push(orderId);
-        localStorage.setItem('userOrderIds', JSON.stringify(userOrderIds));
+    const orderIds = loadUserOrderIds();
+    if (!orderIds.includes(orderId)) {
+        orderIds.push(orderId);
+        localStorage.setItem(STORAGE_KEYS.USER_ORDERS, JSON.stringify(orderIds));
     }
 };
 
@@ -353,6 +475,7 @@ const startOrdersListener = () => {
         off(ref(rtdb, 'orders'), ordersListener);
     }
 
+    const userOrderIds = loadUserOrderIds();
     if (userOrderIds.length === 0) {
         userOrders = [];
         updateOrdersDisplay();
@@ -382,7 +505,6 @@ const startOrdersListener = () => {
 };
 
 const loadUserOrders = () => {
-    userOrderIds = JSON.parse(localStorage.getItem('userOrderIds') || '[]');
     startOrdersListener();
 };
 
@@ -554,6 +676,16 @@ const submitOrder = async (event) => {
         return;
     }
 
+    // Сохраняем данные пользователя
+    userData = {
+        tentLetter: tentLetter,
+        tentNumber: tentNumber,
+        phone: phone,
+        deviceId: deviceId,
+        lastOrderTime: Date.now()
+    };
+    saveUserData();
+
     try {
         showLoading();
 
@@ -572,7 +704,8 @@ const submitOrder = async (event) => {
             courierId: null,
             courierName: null,
             takenAt: null,
-            qrCode: `tent-${tentNumberFull}-${orderId}`
+            qrCode: `tent-${tentNumberFull}-${orderId}`,
+            deviceId: deviceId // Добавляем ID устройства для связки
         };
 
         const orderRef = ref(rtdb, `orders/${orderId}`);
@@ -602,9 +735,14 @@ const submitOrder = async (event) => {
 
 window.newOrder = () => {
     cart = [];
+    saveCart(); // Очищаем сохраненную корзину
     updateCartDisplay();
     updateOrdersDisplay();
     document.getElementById('checkout-form').reset();
+    
+    // Восстанавливаем сохраненные данные пользователя
+    loadUserData();
+    
     switchTab('products');
     loadProducts();
 };
@@ -757,11 +895,39 @@ const setupTentSelector = () => {
 window.selectTentNumber = (number) => {
     document.getElementById('tent-number').value = number;
     document.getElementById('tent-number-list').style.display = 'none';
+    
+    // Сохраняем введенный номер палатки
+    userData.tentNumber = number;
+    saveUserData();
+};
+
+// Обработчики изменения данных формы для автосохранения
+const setupFormAutoSave = () => {
+    const tentLetterSelect = document.getElementById('tent-letter');
+    const phoneInput = document.getElementById('phone');
+
+    tentLetterSelect.addEventListener('change', (e) => {
+        userData.tentLetter = e.target.value;
+        saveUserData();
+    });
+
+    phoneInput.addEventListener('input', (e) => {
+        userData.phone = e.target.value;
+        saveUserData();
+    });
 };
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Инициализация ID устройства
+    deviceId = getDeviceId();
+    
+    // Загрузка сохраненных данных
+    loadUserData();
+    loadCart();
+
     document.getElementById('checkout-form').addEventListener('submit', submitOrder);
     setupTentSelector();
+    setupFormAutoSave();
 
     document.getElementById('phone').addEventListener('input', function (e) {
         let value = e.target.value.replace(/\D/g, '');
@@ -779,6 +945,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         e.target.value = value;
+        
+        // Автосохранение телефона
+        userData.phone = value;
+        saveUserData();
     });
 
     document.getElementById('chat-input').addEventListener('keypress', function (e) {
@@ -792,6 +962,18 @@ document.addEventListener('DOMContentLoaded', function () {
             closeChat();
         }
     });
+
+    // Показываем приветственное сообщение для возвращающихся пользователей
+    if (userData.lastOrderTime) {
+        const lastOrderDate = new Date(userData.lastOrderTime);
+        const daysSinceLastOrder = (Date.now() - userData.lastOrderTime) / (1000 * 60 * 60 * 24);
+        
+        if (daysSinceLastOrder < 30) { // Если последний заказ был менее 30 дней назад
+            setTimeout(() => {
+                showNotification(`Добро пожаловать обратно! ${userData.tentLetter ? `Палатка ${userData.tentLetter}-${userData.tentNumber} сохранена` : ''}`, 'success');
+            }, 1000);
+        }
+    }
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
