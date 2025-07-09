@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neko Vipes - Админ панель</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="auth-screen" id="auth-screen">
+            <div class="auth-form">
+                <div class="logo">🐱 Neko Admin</div>
+                <h2>Панель администратора</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Пароль" required>
+                    </div>
+                    <button type="submit" class="login-btn">Войти</button>
+                </form>
+                <div class="auth-error" id="auth-error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="email-verification" id="email-verification" style="display: none;">
+            <div class="verification-form">
+                <div class="logo">📧 Подтверждение</div>
+                <h2>Проверьте почту</h2>
+                <p>Мы отправили письмо с подтверждением на ваш email</p>
+                <button class="resend-btn" onclick="resendVerification()">Отправить повторно</button>
+                <button class="back-btn" onclick="backToLogin()">Назад</button>
+            </div>
+        </div>
+
+        <div class="admin-panel" id="admin-panel" style="display: none;">
+            <header class="header">
+                <div class="header-content">
+                    <h1 class="logo">🐱 Neko Admin</h1>
+                    <div class="admin-info">
+                        <span class="admin-email" id="admin-email"></span>
+                        <button class="logout-btn" onclick="logout()">Выйти</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main">
+                <div class="tabs-navigation">
+                    <button class="tab-btn active" onclick="switchTab('dashboard')">
+                        Главная
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('orders')">
+                        Заказы <span class="badge" id="orders-badge">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('couriers')">
+                        Курьеры <span class="badge" id="couriers-badge">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('products')">
+                        Товары <span class="badge" id="products-badge">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('create-courier')">
+                        Новый курьер
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-section active" id="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>Панель управления</h2>
+                            <button class="refresh-btn" onclick="loadAllData()">🔄</button>
+                        </div>
+                        <div class="dashboard-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">📦</div>
+                                <div class="stat-info">
+                                    <div class="stat-number" id="total-orders">0</div>
+                                    <div class="stat-label">Всего заказов</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🚀</div>
+                                <div class="stat-info">
+                                    <div class="stat-number" id="active-orders">0</div>
+                                    <div class="stat-label">Активные заказы</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-info">
+                                    <div class="stat-number" id="total-couriers">0</div>
+                                    <div class="stat-label">Всего курьеров</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-info">
+                                    <div class="stat-number" id="active-couriers">0</div>
+                                    <div class="stat-label">Активные курьеры</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="recent-activity">
+                            <h3>Последние заказы</h3>
+                            <div class="activity-list" id="recent-orders">
+                                <div class="empty-state">Загрузка...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-section" id="orders-section">
+                        <div class="section-header">
+                            <h2>Управление заказами</h2>
+                            <button class="refresh-btn" onclick="loadAllData()">🔄</button>
+                        </div>
+                        <div class="orders-tabs">
+                            <button class="orders-tab-btn active" onclick="switchOrdersTab('all')">
+                                Все <span class="badge" id="all-orders-badge">0</span>
+                            </button>
+                            <button class="orders-tab-btn" onclick="switchOrdersTab('active')">
+                                Активные <span class="badge" id="orders-active-badge">0</span>
+                            </button>
+                            <button class="orders-tab-btn" onclick="switchOrdersTab('completed')">
+                                Завершенные <span class="badge" id="orders-completed-badge">0</span>
+                            </button>
+                        </div>
+                        <div class="orders-content">
+                            <div class="orders-list" id="orders-list">
+                                <div class="empty-state">Нет заказов</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-section" id="couriers-section">
+                        <div class="section-header">
+                            <h2>Управление курьерами</h2>
+                            <button class="refresh-btn" onclick="loadAllData()">🔄</button>
+                        </div>
+                        <div class="couriers-tabs">
+                            <button class="couriers-tab-btn active" onclick="switchCouriersTab('all')">
+                                Все <span class="badge" id="all-couriers-badge">0</span>
+                            </button>
+                            <button class="couriers-tab-btn" onclick="switchCouriersTab('active')">
+                                Активные <span class="badge" id="couriers-active-badge">0</span>
+                            </button>
+                            <button class="couriers-tab-btn" onclick="switchCouriersTab('blocked')">
+                                Заблокированные <span class="badge" id="couriers-blocked-badge">0</span>
+                            </button>
+                        </div>
+                        <div class="couriers-content">
+                            <div class="couriers-list" id="couriers-list">
+                                <div class="empty-state">Нет курьеров</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-section" id="create-courier-section">
+                        <div class="section-header">
+                            <h2>Создать курьера</h2>
+                        </div>
+                        <div class="create-courier-content">
+                            <form class="courier-form" id="courier-form">
+                                <div class="form-group">
+                                    <label for="courier-name">Имя курьера</label>
+                                    <input type="text" id="courier-name" required placeholder="Введите имя">
+                                </div>
+                                <div class="form-group">
+                                    <label for="courier-login">Логин</label>
+                                    <input type="text" id="courier-login" required placeholder="Введите логин">
+                                </div>
+                                <div class="form-group">
+                                    <label for="courier-password">Пароль</label>
+                                    <input type="password" id="courier-password" required placeholder="Введите пароль">
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="courier-active" checked>
+                                        <span class="checkmark"></span>
+                                        Активный аккаунт
+                                    </label>
+                                </div>
+                                <button type="submit" class="create-btn">Создать курьера</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="tab-section" id="products-section">
+                        <div class="section-header">
+                            <h2>Управление товарами</h2>
+                            <button class="add-product-btn" onclick="showCreateProductModal()">+ Добавить товар</button>
+                        </div>
+                        <div class="products-content">
+                            <div class="products-list" id="products-list">
+                                <div class="empty-state">Нет товаров</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="modal-overlay" id="modal-overlay" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modal-title">Заголовок</h3>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-content" id="modal-content">
+                </div>
+                <div class="modal-actions" id="modal-actions">
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neko Vipes - Курьерская панель</title>
+    <link rel="stylesheet" href="courier.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="auth-screen" id="auth-screen">
+            <div class="auth-form">
+                <div class="logo">🐱 Neko Courier</div>
+                <h2>Вход для курьеров</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <input type="text" id="login" placeholder="Логин" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Пароль" required>
+                    </div>
+                    <button type="submit" class="login-btn">Войти</button>
+                </form>
+                <div class="auth-error" id="auth-error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="courier-panel" id="courier-panel" style="display: none;">
+            <header class="header">
+                <div class="header-content">
+                    <h1 class="logo">🐱 Neko Courier</h1>
+                    <div class="courier-info">
+                        <span class="courier-name" id="courier-name"></span>
+                        <button class="logout-btn" onclick="logout()">Выйти</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main">
+                <div class="tabs-navigation">
+                    <button class="tab-btn active" onclick="switchTab('available')">
+                        Доступные заказы <span class="badge" id="available-badge">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('my-orders')">
+                        Мои заказы <span class="badge" id="my-orders-badge">0</span>
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-section active" id="available-section">
+                        <div class="section-header">
+                            <h2>Доступные заказы</h2>
+                            <button class="refresh-btn" onclick="loadOrders()">🔄</button>
+                        </div>
+                        <div class="orders-list" id="available-orders">
+                            <div class="empty-state">Нет доступных заказов</div>
+                        </div>
+                    </div>
+
+                    <div class="tab-section" id="my-orders-section">
+                        <div class="section-header">
+                            <h2>Мои заказы</h2>
+                            <button class="refresh-btn" onclick="loadOrders()">🔄</button>
+                        </div>
+
+                        <div class="my-orders-tabs">
+                            <button class="my-orders-tab-btn active" onclick="switchMyOrdersTab('active')">
+                                Активные <span class="badge" id="my-active-badge">0</span>
+                            </button>
+                            <button class="my-orders-tab-btn" onclick="switchMyOrdersTab('completed')">
+                                Выполненные <span class="badge" id="my-completed-badge">0</span>
+                            </button>
+                        </div>
+
+                        <div class="my-orders-content">
+                            <div class="my-orders-tab-section active" id="my-active-section">
+                                <div class="orders-list" id="my-active-orders">
+                                    <div class="empty-state">У вас нет активных заказов</div>
+                                </div>
+                            </div>
+                            <div class="my-orders-tab-section" id="my-completed-section">
+                                <div class="orders-list" id="my-completed-orders">
+                                    <div class="empty-state">У вас нет выполненных заказов</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="modal-overlay" id="modal-overlay" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Детали заказа</h3>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-content" id="modal-content">
+                </div>
+                <div class="modal-actions" id="modal-actions">
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-modal" id="chat-modal" style="display: none;">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3 id="chat-title">Чат с клиентом</h3>
+                    <button class="chat-close-btn" onclick="closeChat()">×</button>
+                </div>
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Введите сообщение...">
+                    <button class="chat-send-btn" onclick="sendMessage()">Отправить</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script type="module" src="courier.js"></script>
+</body>
+
+</html>

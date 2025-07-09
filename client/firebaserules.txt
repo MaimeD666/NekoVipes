@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Функция для проверки админа
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email_verified == true &&
+             request.auth.token.email in [
+               '1734ksk@gmail.com',  // Замените на реальные email админов
+               'manager@nekowipes.com',
+               'superadmin@nekowipes.com'
+             ];
+    }
+    
+    // Функция для проверки аутентификации
+    function isAuthenticated() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    
+    // Правила для коллекции products (товары)
+    match /products/{productId} {
+      // Все могут читать товары
+      allow read: if true;
+      
+      // Только админы могут создавать товары
+      allow create: if isAdmin();
+      
+      // Админы могут обновлять любые поля, остальные только stock (для заказов)
+      allow update: if isAdmin() || 
+                       (resource != null && 
+                        request.writeFields.hasOnly(['stock']) &&
+                        request.resource.data.stock >= 0);
+      
+      // Только админы могут удалять товары
+      allow delete: if isAdmin();
+    }
+    
+    // Правила для коллекции orders (заказы)
+    match /orders/{orderId} {
+      // Создание заказа разрешено всем
+      allow create: if true;
+      
+      // Чтение заказов разрешено всем (для курьеров и клиентов)
+      allow read: if true;
+      
+      // Обновление заказов разрешено всем (для курьеров)
+      allow update: if true;
+      
+      // Только админы могут удалять заказы
+      allow delete: if isAdmin();
+    }
+    
+    // Правила для коллекции couriers (курьеры)
+    match /couriers/{courierId} {
+      // Чтение разрешено всем (для авторизации курьеров)
+      allow read: if true;
+      
+      // Только админы могут создавать курьеров
+      allow create: if isAdmin();
+      
+      // Только админы могут обновлять данные курьеров
+      allow update: if isAdmin();
+      
+      // Только админы могут удалять курьеров
+      allow delete: if isAdmin();
+    }
+    
+    // Правила для коллекции admins (если потребуется)
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Запрет доступа ко всем остальным коллекциям
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
