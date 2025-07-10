@@ -11,6 +11,7 @@
 
 <body>
     <div class="container">
+        <!-- Экран авторизации -->
         <div class="auth-screen" id="auth-screen">
             <div class="auth-form">
                 <div class="logo">🐱 Neko Admin</div>
@@ -25,6 +26,19 @@
                     <button type="submit" class="login-btn">Войти</button>
                 </form>
                 <div class="auth-error" id="auth-error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Экран подтверждения почты -->
+        <div class="email-verification" id="email-verification" style="display: none;">
+            <div class="verification-form">
+                <div class="logo">🐱 Neko Admin</div>
+                <h2>Подтверждение почты</h2>
+                <p>Мы отправили письмо с подтверждением на вашу почту. Пожалуйста, проверьте почту и подтвердите свой
+                    аккаунт.</p>
+                <p>После подтверждения обновите страницу или войдите заново.</p>
+                <button class="resend-btn" onclick="resendVerification()">Отправить письмо повторно</button>
+                <button class="back-btn" onclick="backToLogin()">Назад к входу</button>
             </div>
         </div>
 
