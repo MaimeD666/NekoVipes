@@ -226,6 +226,15 @@ const login = async (event) => {
         const user = userCredential.user;
 
         if (!user.emailVerified) {
+            // Отправляем письмо с подтверждением
+            try {
+                await sendEmailVerification(user);
+                console.log('Письмо с подтверждением отправлено');
+            } catch (verificationError) {
+                console.error('Ошибка отправки письма:', verificationError);
+            }
+
+            // Показываем экран подтверждения
             const authScreen = document.getElementById('auth-screen');
             const emailVerification = document.getElementById('email-verification');
             if (authScreen) authScreen.style.display = 'none';
@@ -241,8 +250,12 @@ const login = async (event) => {
             showError('Неверный email или пароль');
         } else if (error.code === 'auth/too-many-requests') {
             showError('Слишком много попыток входа. Попробуйте позже');
+        } else if (error.code === 'auth/invalid-email') {
+            showError('Неверный формат email');
+        } else if (error.code === 'auth/user-disabled') {
+            showError('Аккаунт заблокирован');
         } else {
-            showError('Ошибка авторизации');
+            showError('Ошибка авторизации: ' + error.message);
         }
     } finally {
         hideLoading();
@@ -255,6 +268,7 @@ const logout = async () => {
         if (ordersListener) ordersListener();
         currentUser = null;
 
+        // Скрываем все экраны
         const authScreen = document.getElementById('auth-screen');
         const adminPanel = document.getElementById('admin-panel');
         const emailVerification = document.getElementById('email-verification');
@@ -264,6 +278,13 @@ const logout = async () => {
         if (adminPanel) adminPanel.style.display = 'none';
         if (emailVerification) emailVerification.style.display = 'none';
         if (loginForm) loginForm.reset();
+
+        // Очищаем поля ввода
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+
     } catch (error) {
         console.error('Ошибка выхода:', error);
     }
@@ -282,6 +303,37 @@ const showAdminPanel = () => {
 
     loadAllData();
     startOrdersListener();
+};
+
+// Функция для повторной отправки письма с подтверждением
+window.resendVerification = async () => {
+    try {
+        showLoading();
+        const user = auth.currentUser;
+        if (user) {
+            await sendEmailVerification(user);
+            alert('Письмо с подтверждением отправлено повторно. Проверьте свою почту.');
+        } else {
+            alert('Сначала войдите в систему');
+        }
+    } catch (error) {
+        console.error('Ошибка отправки подтверждения:', error);
+        if (error.code === 'auth/too-many-requests') {
+            alert('Слишком много запросов. Попробуйте позже.');
+        } else {
+            alert('Ошибка отправки письма: ' + error.message);
+        }
+    } finally {
+        hideLoading();
+    }
+};
+
+// Функция для возвращения к экрану входа
+window.backToLogin = () => {
+    const emailVerification = document.getElementById('email-verification');
+    const authScreen = document.getElementById('auth-screen');
+    if (emailVerification) emailVerification.style.display = 'none';
+    if (authScreen) authScreen.style.display = 'flex';
 };
 
 window.switchTab = (tabName) => {
@@ -1799,50 +1851,42 @@ window.closeModal = () => {
     if (modalOverlay) modalOverlay.style.display = 'none';
 };
 
-window.resendVerification = async () => {
-    try {
-        if (auth.currentUser) {
-            await sendEmailVerification(auth.currentUser);
-            alert('Письмо с подтверждением отправлено повторно');
-        }
-    } catch (error) {
-        console.error('Ошибка отправки подтверждения:', error);
-        alert('Ошибка отправки письма');
-    }
-};
-
-window.backToLogin = () => {
-    const emailVerification = document.getElementById('email-verification');
-    const authScreen = document.getElementById('auth-screen');
-    if (emailVerification) emailVerification.style.display = 'none';
-    if (authScreen) authScreen.style.display = 'flex';
-};
-
 window.loadAllData = loadAllData;
 window.logout = logout;
 window.toggleCourierStatus = toggleCourierStatus;
 window.deleteCourier = deleteCourier;
 window.deleteProduct = deleteProduct;
 
+// Обработчик изменения состояния аутентификации
 onAuthStateChanged(auth, (user) => {
-    if (user && user.emailVerified) {
-        currentUser = user;
-        showAdminPanel();
-    } else if (user && !user.emailVerified) {
-        const authScreen = document.getElementById('auth-screen');
-        const emailVerification = document.getElementById('email-verification');
-        if (authScreen) authScreen.style.display = 'none';
-        if (emailVerification) emailVerification.style.display = 'flex';
+    if (user) {
+        if (user.emailVerified) {
+            // Пользователь авторизован и подтвердил email
+            currentUser = user;
+            showAdminPanel();
+        } else {
+            // Пользователь авторизован, но не подтвердил email
+            const authScreen = document.getElementById('auth-screen');
+            const emailVerification = document.getElementById('email-verification');
+            const adminPanel = document.getElementById('admin-panel');
+
+            if (authScreen) authScreen.style.display = 'none';
+            if (emailVerification) emailVerification.style.display = 'flex';
+            if (adminPanel) adminPanel.style.display = 'none';
+        }
     } else {
+        // Пользователь не авторизован
         const authScreen = document.getElementById('auth-screen');
         const adminPanel = document.getElementById('admin-panel');
         const emailVerification = document.getElementById('email-verification');
+
         if (authScreen) authScreen.style.display = 'flex';
         if (adminPanel) adminPanel.style.display = 'none';
         if (emailVerification) emailVerification.style.display = 'none';
     }
 });
 
+// Обработчики событий DOM
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const courierForm = document.getElementById('courier-form');
@@ -1859,6 +1903,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Инициализация фильтров после загрузки данных
     setTimeout(() => {
         if (allOrders.length > 0 || allCouriers.length > 0 || allProducts.length > 0) {
             initializeFilters();
