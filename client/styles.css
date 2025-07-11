@@ -242,13 +242,17 @@ body {
 }
 
 .cart-header,
-.checkout-header {
+.checkout-header,
+.orders-header,
+.info-header {
     flex-shrink: 0;
     margin-bottom: 15px;
 }
 
 .cart-header h2,
-.checkout-header h2 {
+.checkout-header h2,
+.orders-header h2,
+.info-header h2 {
     color: #20B2AA;
     font-size: 1.3rem;
     text-align: center;
@@ -280,7 +284,9 @@ body {
 }
 
 .cart-content,
-.checkout-content {
+.checkout-content,
+.orders-content,
+.info-content {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -542,18 +548,6 @@ body {
     color: #666;
     font-style: italic;
     padding: 20px;
-}
-
-.orders-header {
-    flex-shrink: 0;
-    margin-bottom: 15px;
-}
-
-.orders-header h2 {
-    color: #20B2AA;
-    font-size: 1.3rem;
-    text-align: center;
-    margin: 0;
 }
 
 .orders-content {
@@ -821,6 +815,175 @@ body {
 .orders-tab-btn.active #active-orders-badge,
 .orders-tab-btn.active #delivered-orders-badge {
     background: rgba(255, 255, 255, 0.3);
+}
+
+.info-content {
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.info-block {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #20B2AA;
+}
+
+.info-block h3 {
+    color: #20B2AA;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.product-info-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.product-info-card h4 {
+    color: #20B2AA;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.product-price-info {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #20B2AA;
+    margin-bottom: 12px;
+}
+
+.product-info-card p {
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.product-info-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.product-info-card li {
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.product-info-card li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #20B2AA;
+    font-weight: bold;
+}
+
+.delivery-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.delivery-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.delivery-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(32, 178, 170, 0.1);
+}
+
+.delivery-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.delivery-card h4 {
+    color: #20B2AA;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.delivery-card p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.step {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.step-number {
+    background: #20B2AA;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content h4 {
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.step-content p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.contacts-info {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.contacts-info p {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.contacts-info p:last-child {
+    margin-bottom: 0;
 }
 
 .chat-modal {
@@ -1146,6 +1309,23 @@ body {
         left: 10px;
         max-width: none;
     }
+
+    .product-info-grid,
+    .delivery-info,
+    .steps {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .info-block {
+        padding: 15px;
+    }
+
+    .step {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1223,5 +1403,14 @@ body {
     .chat-send-btn {
         padding: 8px 12px;
         font-size: 0.75rem;
+    }
+
+    .info-block {
+        padding: 12px;
+    }
+
+    .delivery-card,
+    .product-info-card {
+        padding: 15px;
     }
 }
