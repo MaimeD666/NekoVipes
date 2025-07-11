@@ -29,7 +29,6 @@ const COLLECTIONS = {
     PRODUCTS: 'products'
 };
 
-// Ключи для localStorage
 const STORAGE_KEYS = {
     USER_DATA: 'nekoVipes_userData',
     CART: 'nekoVipes_cart',
@@ -46,12 +45,10 @@ let currentChatOrderId = null;
 let chatListener = null;
 let deviceId = '';
 
-// Генерация уникального ID устройства
 const generateDeviceId = () => {
     return 'device_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
 };
 
-// Получение или создание ID устройства
 const getDeviceId = () => {
     let id = localStorage.getItem(STORAGE_KEYS.DEVICE_ID);
     if (!id) {
@@ -61,12 +58,10 @@ const getDeviceId = () => {
     return id;
 };
 
-// Сохранение пользовательских данных
 const saveUserData = () => {
     localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
 };
 
-// Загрузка пользовательских данных
 const loadUserData = () => {
     const saved = localStorage.getItem(STORAGE_KEYS.USER_DATA);
     if (saved) {
@@ -78,7 +73,6 @@ const loadUserData = () => {
         }
     }
     
-    // Автозаполнение формы
     if (userData.tentLetter) {
         const tentLetterSelect = document.getElementById('tent-letter');
         if (tentLetterSelect) {
@@ -101,12 +95,10 @@ const loadUserData = () => {
     }
 };
 
-// Сохранение корзины
 const saveCart = () => {
     localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
 };
 
-// Загрузка корзины
 const loadCart = () => {
     const saved = localStorage.getItem(STORAGE_KEYS.CART);
     if (saved) {
@@ -120,13 +112,11 @@ const loadCart = () => {
     }
 };
 
-// Сохранение ID заказов пользователя
 const saveUserOrders = () => {
     const orderIds = userOrders.map(order => order.id);
     localStorage.setItem(STORAGE_KEYS.USER_ORDERS, JSON.stringify(orderIds));
 };
 
-// Загрузка ID заказов пользователя
 const loadUserOrderIds = () => {
     const saved = localStorage.getItem(STORAGE_KEYS.USER_ORDERS);
     if (saved) {
@@ -140,7 +130,6 @@ const loadUserOrderIds = () => {
     return [];
 };
 
-// Очистка данных пользователя (для отладки)
 const clearUserData = () => {
     localStorage.removeItem(STORAGE_KEYS.USER_DATA);
     localStorage.removeItem(STORAGE_KEYS.CART);
@@ -152,7 +141,6 @@ const clearUserData = () => {
     location.reload();
 };
 
-// Добавляем функцию очистки в window для отладки
 window.clearUserData = clearUserData;
 
 const showLoading = () => {
@@ -335,7 +323,7 @@ window.addToCart = (productId) => {
     }
 
     updateCartDisplay();
-    saveCart(); // Сохраняем корзину
+    saveCart();
     document.getElementById(`qty-${productId}`).value = 1;
 
     const button = event.target;
@@ -406,13 +394,13 @@ window.updateCartItem = (index, change) => {
     }
 
     updateCartDisplay();
-    saveCart(); // Сохраняем корзину
+    saveCart();
 };
 
 window.removeFromCart = (index) => {
     cart.splice(index, 1);
     updateCartDisplay();
-    saveCart(); // Сохраняем корзину
+    saveCart();
 };
 
 const showCheckout = () => {
@@ -676,7 +664,6 @@ const submitOrder = async (event) => {
         return;
     }
 
-    // Сохраняем данные пользователя
     userData = {
         tentLetter: tentLetter,
         tentNumber: tentNumber,
@@ -705,7 +692,7 @@ const submitOrder = async (event) => {
             courierName: null,
             takenAt: null,
             qrCode: `tent-${tentNumberFull}-${orderId}`,
-            deviceId: deviceId // Добавляем ID устройства для связки
+            deviceId: deviceId
         };
 
         const orderRef = ref(rtdb, `orders/${orderId}`);
@@ -735,12 +722,11 @@ const submitOrder = async (event) => {
 
 window.newOrder = () => {
     cart = [];
-    saveCart(); // Очищаем сохраненную корзину
+    saveCart();
     updateCartDisplay();
     updateOrdersDisplay();
     document.getElementById('checkout-form').reset();
     
-    // Восстанавливаем сохраненные данные пользователя
     loadUserData();
     
     switchTab('products');
@@ -896,12 +882,10 @@ window.selectTentNumber = (number) => {
     document.getElementById('tent-number').value = number;
     document.getElementById('tent-number-list').style.display = 'none';
     
-    // Сохраняем введенный номер палатки
     userData.tentNumber = number;
     saveUserData();
 };
 
-// Обработчики изменения данных формы для автосохранения
 const setupFormAutoSave = () => {
     const tentLetterSelect = document.getElementById('tent-letter');
     const phoneInput = document.getElementById('phone');
@@ -918,10 +902,8 @@ const setupFormAutoSave = () => {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Инициализация ID устройства
     deviceId = getDeviceId();
     
-    // Загрузка сохраненных данных
     loadUserData();
     loadCart();
 
@@ -946,7 +928,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         e.target.value = value;
         
-        // Автосохранение телефона
         userData.phone = value;
         saveUserData();
     });
@@ -963,12 +944,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Показываем приветственное сообщение для возвращающихся пользователей
     if (userData.lastOrderTime) {
         const lastOrderDate = new Date(userData.lastOrderTime);
         const daysSinceLastOrder = (Date.now() - userData.lastOrderTime) / (1000 * 60 * 60 * 24);
         
-        if (daysSinceLastOrder < 30) { // Если последний заказ был менее 30 дней назад
+        if (daysSinceLastOrder < 30) {
             setTimeout(() => {
                 showNotification(`Добро пожаловать обратно! ${userData.tentLetter ? `Палатка ${userData.tentLetter}-${userData.tentNumber} сохранена` : ''}`, 'success');
             }, 1000);
