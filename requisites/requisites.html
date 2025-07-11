@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Реквизиты - Neko Wipes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #20B2AA 0%, #3CB371 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #20B2AA;
+        }
+
+        h1 {
+            color: #20B2AA;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid #20B2AA;
+        }
+
+        .section h2 {
+            color: #20B2AA;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .director-section {
+            background: linear-gradient(135deg, #20B2AA, #17a2b8);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .director-section h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .director-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .director-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .director-item .info-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .director-item .info-value {
+            color: white;
+            font-weight: 600;
+        }
+
+        .contacts {
+            background: #28a745;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .contacts h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .contact-item a:hover {
+            border-bottom-color: white;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: #20B2AA;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            background: #1a9b93;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(32, 178, 170, 0.4);
+        }
+
+        .important-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .important-note h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .important-note p {
+            color: #856404;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .info-grid,
+            .director-info {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🐱</div>
+            <h1>Реквизиты организации</h1>
+            <p class="subtitle">Neko Wipes - Доставка влажных салфеток на фестивалях</p>
+        </div>
+
+        <div class="section">
+            <h2><span class="section-icon">🏢</span>Сведения об организации</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Полное наименование</div>
+                    <div class="info-value">Общество с ограниченной ответственностью "ПУЛЬС ПЛЮС"</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Сокращенное наименование</div>
+                    <div class="info-value">ООО "ПУЛЬС ПЛЮС"</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ИНН</div>
+                    <div class="info-value">3665147880</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">КПП</div>
+                    <div class="info-value">366501001</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Юридический адрес</div>
+                    <div class="info-value">394070, Россия, Воронежская обл., г. Воронеж, ул. Берег реки Дон, д. 26а, помещение 102</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="director-section">
+            <h2><span class="section-icon">👨‍💼</span>Руководитель</h2>
+            <div class="director-info">
+                <div class="director-item">
+                    <div class="info-label">Генеральный директор</div>
+                    <div class="info-value">Бенецианов Всеволод Александрович</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="section-icon">🏦</span>Банковские реквизиты</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Банк</div>
+                    <div class="info-value">ПАО «Банк ПСБ»</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">БИК</div>
+                    <div class="info-value">044525555</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Корреспондентский счёт</div>
+                    <div class="info-value">30101810400000000555</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Расчётный счёт</div>
+                    <div class="info-value">40702810500000344748</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="section-icon">📋</span>Деятельность</h2>
+            <div class="info-item">
+                <div class="info-label">Основная деятельность</div>
+                <div class="info-value">Розничная торговля прочими товарами в специализированных магазинах</div>
+            </div>
+            <div class="info-item" style="margin-top: 15px;">
+                <div class="info-label">Описание услуг</div>
+                <div class="info-value">Доставка влажных салфеток и сопутствующих гигиенических товаров на территории фестивалей, концертов и массовых мероприятий с помощью курьерской службы</div>
+            </div>
+        </div>
+
+        <div class="contacts">
+            <h2><span class="section-icon">📞</span>Контактная информация</h2>
+            <div class="contact-item">
+                <strong>Email:</strong> <a href="mailto:info@nekowipes.com">info@nekowipes.com</a>
+            </div>
+            <div class="contact-item">
+                <strong>Сайт:</strong> <a href="/">nekowipes.com</a>
+            </div>
+            <div class="contact-item">
+                <strong>Режим работы:</strong> Во время проведения фестивалей и мероприятий
+            </div>
+        </div>
+
+        <div class="important-note">
+            <h3>⚠️ Важная информация</h3>
+            <p>Данная страница предназначена исключительно для верификации в платежных системах и содержит официальные реквизиты организации в соответствии с требованиями законодательства РФ.</p>
+        </div>
+
+        <a href="../" class="back-link">← Вернуться на главную</a>
+    </div>
+</body>
+</html>
