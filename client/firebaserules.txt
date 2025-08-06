@@ -7,18 +7,17 @@ service cloud.firestore {
       return request.auth != null && 
              request.auth.token.email_verified == true &&
              request.auth.token.email in [
-               '1734ksk@gmail.com',  // Замените на реальные email админов
+               '1734ksk@gmail.com',
                'manager@nekowipes.com',
                'superadmin@nekowipes.com'
              ];
     }
     
-    // Функция для проверки аутентификации
     function isAuthenticated() {
       return request.auth != null && request.auth.token.email_verified == true;
     }
     
-    // Правила для коллекции products (товары)
+    // Правила для коллекции products
     match /products/{productId} {
       // Все могут читать товары
       allow read: if true;
@@ -26,7 +25,7 @@ service cloud.firestore {
       // Только админы могут создавать товары
       allow create: if isAdmin();
       
-      // Админы могут обновлять любые поля, остальные только stock (для заказов)
+      // Админы могут обновлять любые поля, остальные только stock
       allow update: if isAdmin() || 
                        (resource != null && 
                         request.writeFields.hasOnly(['stock']) &&
@@ -36,7 +35,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Правила для коллекции orders (заказы)
+    // Правила для коллекции orders
     match /orders/{orderId} {
       // Создание заказа разрешено всем
       allow create: if true;
@@ -51,7 +50,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Правила для коллекции couriers (курьеры)
+    // Правила для коллекции couriers
     match /couriers/{courierId} {
       // Чтение разрешено всем (для авторизации курьеров)
       allow read: if true;
@@ -66,7 +65,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Правила для коллекции admins (если потребуется)
+    // Правила для коллекции admins (НЕ используется)
     match /admins/{adminId} {
       allow read, write: if isAdmin();
     }
