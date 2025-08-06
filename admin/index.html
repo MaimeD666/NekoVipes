@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neko Vipes - Админ панель</title>
+    <title>EventTrade - Админ панель</title>
     <link rel="stylesheet" href="admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -14,7 +14,7 @@
         <!-- Экран авторизации -->
         <div class="auth-screen" id="auth-screen">
             <div class="auth-form">
-                <div class="logo">🐱 Neko Admin</div>
+                <div class="logo">🐱 Event-Trade</div>
                 <h2>Панель администратора</h2>
                 <form id="login-form">
                     <div class="form-group">
@@ -32,7 +32,7 @@
         <!-- Экран подтверждения почты -->
         <div class="email-verification" id="email-verification" style="display: none;">
             <div class="verification-form">
-                <div class="logo">🐱 Neko Admin</div>
+                <div class="logo">🐱 Event-Trade</div>
                 <h2>Подтверждение почты</h2>
                 <p>Мы отправили письмо с подтверждением на вашу почту. Пожалуйста, проверьте почту и подтвердите свой
                     аккаунт.</p>
@@ -45,7 +45,7 @@
         <div class="admin-panel" id="admin-panel" style="display: none;">
             <header class="header">
                 <div class="header-content">
-                    <h1 class="logo">🐱 Neko Admin</h1>
+                    <h1 class="logo">🐱 Админ панель</h1>
                     <div class="admin-info">
                         <span class="admin-email" id="admin-email"></span>
                         <button class="logout-btn" onclick="logout()">Выйти</button>
@@ -100,7 +100,7 @@
                                 <div class="stat-icon">💰</div>
                                 <div class="stat-info">
                                     <div class="stat-number" id="total-revenue">0 ₽</div>
-                                    <div class="stat-label">Общий доход</div>
+                                    <div class="stat-label"><b>Общий доход</b></div>
                                     <div class="stat-change" id="revenue-change">+0%</div>
                                 </div>
                             </div>
@@ -108,7 +108,7 @@
                                 <div class="stat-icon">📦</div>
                                 <div class="stat-info">
                                     <div class="stat-number" id="total-orders">0</div>
-                                    <div class="stat-label">Всего заказов</div>
+                                    <div class="stat-label"><b>Всего заказов</b></div>
                                     <div class="stat-change" id="orders-change">+0%</div>
                                 </div>
                             </div>
@@ -116,7 +116,7 @@
                                 <div class="stat-icon">🚀</div>
                                 <div class="stat-info">
                                     <div class="stat-number" id="active-orders">0</div>
-                                    <div class="stat-label">Активные заказы</div>
+                                    <div class="stat-label"><b>Активные заказы</b></div>
                                     <div class="stat-change" id="active-change">+0%</div>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@
                                 <div class="stat-icon">👥</div>
                                 <div class="stat-info">
                                     <div class="stat-number" id="active-couriers">0</div>
-                                    <div class="stat-label">Активные курьеры</div>
+                                    <div class="stat-label"><b>Активные курьеры</b></div>
                                     <div class="stat-change" id="couriers-change">+0%</div>
                                 </div>
                             </div>
